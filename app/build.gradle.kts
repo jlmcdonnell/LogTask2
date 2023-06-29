@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id("de.mannodermaus.android-junit5")
 }
 
 android {
@@ -17,6 +18,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments += "runnerBuilder" to "de.mannodermaus.junit5.AndroidJUnit5Builder"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -34,6 +36,7 @@ android {
     kotlinOptions {
         freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
         freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-Xopt-in=androidx.compose.ui.test.ExperimentalTestApi"
     }
     buildFeatures {
         compose = true
@@ -53,7 +56,6 @@ tasks.withType<Test> {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.activity:activity-compose:1.7.2")
@@ -69,6 +71,14 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.45")
 
     implementation("com.google.code.gson:gson:2.10.1")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    androidTestImplementation("de.mannodermaus.junit5:android-test-compose:1.0.0-SNAPSHOT")
+    androidTestImplementation("de.mannodermaus.junit5:android-test-core:1.3.0")
+    androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.3.0")
 
     testImplementation("io.kotest:kotest-assertions-core:5.6.2")
     testImplementation("io.kotest:kotest-runner-junit5:5.6.2")

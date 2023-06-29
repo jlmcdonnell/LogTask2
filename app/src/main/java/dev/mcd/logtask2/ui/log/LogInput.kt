@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -31,7 +32,8 @@ fun LogInput(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         OutlinedTextField(
-            modifier = Modifier.weight(4f),
+            modifier = Modifier.weight(4f).testTag("log-input"),
+            maxLines = 1,
             value = textFieldValues,
             onValueChange = { textFieldValues = it },
             label = { Text(stringResource(id = R.string.log_hint)) },
