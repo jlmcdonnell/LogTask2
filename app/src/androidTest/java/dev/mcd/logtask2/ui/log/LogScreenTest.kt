@@ -6,30 +6,28 @@ import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
-import de.mannodermaus.junit5.compose.ComposeContext
-import de.mannodermaus.junit5.compose.createComposeExtension
 import dev.mcd.logtask2.R
 import dev.mcd.logtask2.data.LogStore
 import dev.mcd.logtask2.data.localTimeFormatter
 import dev.mcd.logtask2.ui.LogTask2Theme
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.time.LocalTime
 
-class LogScreenKtTest {
+class LogScreenTest {
 
-    @JvmField
-    @RegisterExtension
-    val composeExtension = createComposeExtension()
+    @get:Rule
+    val composeRule = createComposeRule()
 
     private lateinit var cacheFile: File
     private lateinit var viewModel: LogViewModel
@@ -37,7 +35,8 @@ class LogScreenKtTest {
 
     @Test
     fun addLog_clearsInput() {
-        logScreenTest {
+        setupTestContent()
+        with(composeRule) {
             onNodeWithTag("log-input")
                 .performTextInput("Hello, World!")
 
@@ -51,9 +50,10 @@ class LogScreenKtTest {
 
     @Test
     fun addLog_appendsList_timeIsShown() {
-        logScreenTest {
-            val time = LocalTime.now().format(localTimeFormatter)
+        setupTestContent()
+        val time = LocalTime.now().format(localTimeFormatter)
 
+        with(composeRule) {
             onNodeWithTag("log-input")
                 .performTextInput("Hello, World!")
 
@@ -67,7 +67,8 @@ class LogScreenKtTest {
 
     @Test
     fun addLog_appendsList_textIsShown() {
-        logScreenTest {
+        setupTestContent()
+        with(composeRule) {
             onNodeWithTag("log-input")
                 .performTextInput("Hello, World!")
 
@@ -79,7 +80,7 @@ class LogScreenKtTest {
         }
     }
 
-    @BeforeEach
+    @Before
     fun setUp() {
         cacheFile = TemporaryFolder().let {
             it.create()
@@ -88,21 +89,18 @@ class LogScreenKtTest {
         viewModel = LogViewModel(LogStore(cacheFile))
     }
 
-    @AfterEach
+    @After
     fun tearDown() {
         cacheFile.delete()
     }
 
-    private fun logScreenTest(block: ComposeContext.() -> Unit) {
-        composeExtension.use {
-            setContent {
-                LogTask2Theme {
-                    Surface(modifier = Modifier.fillMaxSize()) {
-                        LogScreen(viewModel)
-                    }
+    private fun setupTestContent() {
+        composeRule.setContent {
+            LogTask2Theme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    LogScreen(viewModel)
                 }
             }
-            block(this)
         }
     }
 }

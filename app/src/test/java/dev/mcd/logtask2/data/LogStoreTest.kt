@@ -1,28 +1,37 @@
 package dev.mcd.logtask2.data
 
 import app.cash.turbine.test
-import io.kotest.core.spec.IsolationMode
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 import java.io.File
 
-class LogStoreTest : FunSpec({
+class LogStoreTest {
 
-    isolationMode = IsolationMode.InstancePerLeaf
-    val cacheFile = File.createTempFile("log", ".json")
+    private lateinit var cacheFile: File
 
-    afterTest {
+    @Before
+    fun setUp() {
+        cacheFile = File.createTempFile("log", ".json")
+    }
+
+    @After
+    fun tearDown() {
         cacheFile.delete()
     }
 
-    test("emit empty list if cache is empty") {
+    @Test
+    fun `emit empty list if cache is empty`() = runBlocking {
         val store = LogStore(cacheFile)
         store.data().test {
-            awaitItem() shouldBe emptyList()
+            assertEquals(emptyList<LogItem>(), awaitItem())
         }
     }
 
-    test("emit cached logs") {
+    @Test
+    fun `emit cached logs`() = runBlocking {
         val store = LogStore(cacheFile)
         val item = LogItem(timestamp = "time", text = "text")
 
@@ -32,17 +41,18 @@ class LogStoreTest : FunSpec({
         // reinitialize from the cache
         val store2 = LogStore(cacheFile)
         store2.data().test {
-            awaitItem() shouldBe listOf(item)
+            assertEquals(listOf(item), awaitItem())
         }
     }
 
-    test("emit log when updated") {
+    @Test
+    fun `emit log when updated`() = runBlocking {
         val store = LogStore(cacheFile)
         val item = LogItem(timestamp = "time", text = "text")
         store.data().test {
-            awaitItem() shouldBe emptyList()
+            assertEquals(emptyList<LogItem>(), awaitItem())
             store.addItem(item)
-            awaitItem() shouldBe listOf(item)
+            assertEquals(listOf(item), awaitItem())
         }
     }
-})
+}

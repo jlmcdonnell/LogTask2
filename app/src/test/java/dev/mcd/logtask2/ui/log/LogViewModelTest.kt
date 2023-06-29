@@ -1,46 +1,60 @@
 package dev.mcd.logtask2.ui.log
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import dev.mcd.logtask2.data.LogItem
 import dev.mcd.logtask2.data.LogStore
 import dev.mcd.logtask2.data.localTimeFormatter
-import io.kotest.core.spec.IsolationMode
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import java.io.File
 import java.time.LocalTime
 
-class LogViewModelTest : FunSpec({
+class LogViewModelTest {
 
-    isolationMode = IsolationMode.InstancePerLeaf
+    @get:Rule
+    var instantExecutorRule: InstantTaskExecutorRule = InstantTaskExecutorRule()
 
-    Dispatchers.setMain(Dispatchers.Unconfined)
+    private lateinit var cacheFile: File
+    private lateinit var store: LogStore
 
-    val cacheFile = File.createTempFile("log", ".json")
-    val store = LogStore(cacheFile)
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
+        cacheFile = File.createTempFile("log", ".json")
+        store = LogStore(cacheFile)
+    }
 
-    afterTest {
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
         cacheFile.delete()
     }
 
-    test("emit log items") {
+    @Test
+    fun `emit log items`() = runBlocking {
         val item = LogItem(timestamp = "time", text = "text")
         store.addItem(item)
 
         val viewModel = LogViewModel(store)
 
-        viewModel.logData.value shouldBe listOf(item)
+        assertEquals(listOf(item), viewModel.logData.value)
     }
 
-    test("add log item") {
+    @Test
+    fun `add log item`() = runBlocking {
         val time = LocalTime.now().format(localTimeFormatter)
         val item = LogItem(timestamp = time, text = "text")
         val viewModel = LogViewModel(store)
 
-        viewModel.logData.value shouldBe emptyList()
+        assertEquals(emptyList<LogItem>(), viewModel.logData.value)
         viewModel.onLogAdded("text")
-        viewModel.logData.value shouldBe listOf(item)
+        assertEquals(listOf(item), viewModel.logData.value)
     }
-
-})
+}

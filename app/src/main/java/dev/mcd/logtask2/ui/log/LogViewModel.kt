@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LogViewModel @Inject constructor(private val logStore: LogStore) : ViewModel() {
 
-    val logData = MutableLiveData<List<LogItem>>()
+    val logData = MutableLiveData<List<LogItem>>(emptyList())
 
     init {
         viewModelScope.launch {
