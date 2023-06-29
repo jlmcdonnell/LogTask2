@@ -7,6 +7,7 @@ import dev.mcd.logtask2.data.localTimeFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -38,7 +39,7 @@ class LogViewModelTest {
     }
 
     @Test
-    fun `emit log items`() = runBlocking {
+    fun `emit log items`() = runTest {
         val item = LogItem(timestamp = "time", text = "text")
         store.addItem(item)
 
@@ -48,7 +49,7 @@ class LogViewModelTest {
     }
 
     @Test
-    fun `add log item`() = runBlocking {
+    fun `add log item`() = runTest {
         val time = LocalTime.now().format(localTimeFormatter)
         val item = LogItem(timestamp = time, text = "text")
         val viewModel = LogViewModel(store)
