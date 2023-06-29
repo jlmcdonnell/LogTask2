@@ -1,3 +1,5 @@
-#LogTask (2)
+# LogTask (2)
 
-A different approach to https://github.com/jlmcdonnell/LogTask2 
+Simplified approach to https://github.com/jlmcdonnell/LogTask using Compose
+
+Unit and UI tests included
